@@ -13,7 +13,6 @@ function World.new()
     return self;
 end
 
-
 function World:AddEntity(entity)
     return table.insert(self.Entities, entity);
 end
