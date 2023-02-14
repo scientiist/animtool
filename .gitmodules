@@ -1,0 +1,3 @@
+[submodule "include/ikkuna"]
+	path = include/ikkuna
+	url = https://github.com/diath/ikkuna
