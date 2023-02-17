@@ -1,3 +1,6 @@
 [submodule "include/ikkuna"]
 	path = include/ikkuna
 	url = https://github.com/diath/ikkuna
+[submodule "include/Simple-Tiled-Implementation"]
+	path = include/Simple-Tiled-Implementation
+	url = https://github.com/karai17/Simple-Tiled-Implementation
