@@ -1,3 +1,16 @@
+--------------------------------------------------
+--- @name Vector2.lua
+--- @descr 2D Vector Implemented as a vaguely datatype-like "Class"
+--- @copyright Conarium Software 2023
+--- @author Joshua O'Leary
+--- @release 1
+---
+--- @see
+-- https://encyclopediaofmath.org/index.php?title=Vector
+-- https://math.libretexts.org/Bookshelves/Calculus/Calculus_3e_(Apex)/10%3A_Vectors
+-- Search GitHub, Google, etc. for "Vector2D implementation"
+
+
 local Vector2 = {}
 
 Vector2.__index = Vector2

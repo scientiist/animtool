@@ -1,22 +1,18 @@
-local GameScene = {};
-GameScene.__index = GameScene;
-function GameScene.new()
-    local self = setmetatable({}, GameScene);
+local Object = require("include.Object");
 
-    self.Entities = {};
+local Scene = Object:subclass("Scene");
 
-    return self;
+function Scene:init()
+
 end
 
-function GameScene:Update()
-    for _, entity in pairs(self.Entities) do
+function Scene:Update()
 
-    end
 end
 
-function GameScene:Destroy()
+function Scene:Destroy()
 
 end
 
 
-return GameScene;
+return Scene;

@@ -1,4 +1,4 @@
-local Vector2 = require("src.Vector2");
+local Vector2 = require("include.Vector2");
 local function GetOverlapsAABB(posA, sizeA, posB, sizeB)
     local absDistX = math.abs(posA.X - posB.X);
     local absDistY = math.abs(posA.Y - posB.Y);
