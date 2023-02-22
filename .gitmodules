@@ -4,3 +4,6 @@
 [submodule "include/Simple-Tiled-Implementation"]
 	path = include/Simple-Tiled-Implementation
 	url = https://github.com/karai17/Simple-Tiled-Implementation
+[submodule "include/love-bone"]
+	path = include/love-bone
+	url = https://github.com/scientiist/love-bone
