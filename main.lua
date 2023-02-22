@@ -67,7 +67,7 @@ local widgets = ikkuna.Widget:new({
             onClick = function()
                 local contextMenu = ikkuna.ContextMenu:new()
                 contextMenu:addOption("Import Skeleton",function()
-                    print("REEEEEEEEE");
+                    print("REEEEEEEEE"); 
                 end);
                 contextMenu:addOption("Play Animation",function()
                     myActor:GetTransformer():SetPower("anim_curl", 1);
