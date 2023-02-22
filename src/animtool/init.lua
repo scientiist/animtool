@@ -3,13 +3,18 @@
 local animtool = {};
 animtool.__index = animtool;
 
-function animtool.new()
-    local self = setmetatable({}, animtool);
 
+local function Hex(hex_string)
 
-
-    return self;
 end
+
+animtool.Settings = {};
+animtool.Settings.GridVisible = true;
+animtool.Settings.GridSize = 8;
+animtool.Settings.GridColor = Hex("#FFFFFF");
+animtool.Settings.GridLineSize = 0.025;
+
+animtool.
 
 function animtool:Update(delta)
 
