@@ -1,5 +1,28 @@
+-- Before actually loading GTK3 and calling FFI C code,
+-- We need to check the platform for GTK3
+
+
+local function probe_for_libgtk3()
+	local result, err = pcall(function()
+		local ffi = require 'ffi';
+		local gtk = ffi.load 'gtk-3';	
+	end)
+	print(result, err);
+	return result;
+end
+
+local libgtk3_load_success = true;
+
+if not probe_for_libgtk3() then
+	libgtk3_load_success = false;
+	print("LibGTK3 not found, file dialogs will be unavaliable");
+	return false
+end
+
+
 local ffi = require 'ffi'
 local gtk = ffi.load 'gtk-3'
+
 ffi.cdef [[
 
 typedef void GtkDialog;

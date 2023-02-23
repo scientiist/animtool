@@ -10,18 +10,20 @@ love.graphics.setDefaultFilter("nearest", "nearest");
 -- Preload Game Assets
 _G.Assets = require("src.assets");
 
+_G.console = require("src.console");
+
+console:addCommand("quit", "Exits the program");
+console:addCommand("import_skeleton", "Imports a skeleton file");
 
 -- Declare Objects
 local Vector2 = require("include.Vector2");
 _G.Vector2 = Vector2;
 
 
-
 -- animtool Editor variables
 local bone = require("include.lovebone");
 local mySkeleton = require("src.TestSkeleton");
 local myActor = bone.newActor(mySkeleton);
-
 
 local settings = {};
 settings.boneLineColor = {255, 0, 0, 255};
@@ -52,6 +54,7 @@ myActor:GetTransformer():SetTransform("anim_curl", testAnim);
 
 
 local filedialog = require("src.filedialog");
+
 require("include.ikkuna.ikkuna");
 
 local EditorDisplay = ikkuna.Display:new();
@@ -73,14 +76,16 @@ local widgets = ikkuna.Widget:new({
                     myActor:GetTransformer():SetPower("anim_curl", 1);
                 end);
                 contextMenu:addOption("Open Animation",function()
-                    
-                    local handle =  filedialog.open("Open Animation");
-                        
+                    if filedialog then
+                    	local handle =  filedialog.open("Open Animation");
+                    end    
                 end);
                 contextMenu:addOption("Save Animation",function()
-                    local filename = filedialog.save("Save Animation");
+
+                    if filedialog then
+			local filename = filedialog.save("Save Animation");
+		    end
                 end);
-                
 
                 contextMenu:addSeparator();
                 contextMenu:show()
