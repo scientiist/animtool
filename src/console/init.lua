@@ -11,6 +11,26 @@ console.Window = ikkuna.Window:new({
     position = {x=200, y = 50},
 });
 
+console.Commands = {};
+
+function console:addCommand(command, desc,)
+
+end
+
+function console.log(...)
+	
+end
+
+function console.textinput(t)
+
+end
+
+function console.keypressed(key)
+
+end
+
+
+
 
 function console:Update(delta)
     self.Canvas:update();
