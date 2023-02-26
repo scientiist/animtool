@@ -200,21 +200,15 @@ end
 myActor:GetTransformer():GetRoot().translation = {love.graphics.getWidth() / 2, love.graphics.getHeight() / 2};
 
 
-function love.keypressed(key, isRepeat)
-	if (key == 'f') then
-		
-	end
-end
-
 function love.load()
     love.window.setTitle("animtool v1.00 - Conarium Software");
-	love.window.setMode(800, 600, {msaa=0});
+	love.window.setMode(1200, 700, {msaa=0});
 end
 
 local prevMous = Vector2.new(love.mouse.getX(), love.mouse.getY());
 
 function love.update(delta)
-
+	console:Update(delta);
     myActor:Update(delta);
 
     EditorDisplay:update(delta);
@@ -242,27 +236,29 @@ function love.update(delta)
 end
 
 function love.draw()
-
+	console:Draw();
     myActor:Draw();
     EditorDisplay:draw();
 end
+
 function love.textinput(text)
+	if console:textinput(text) then return end
 	if EditorDisplay:onTextInput(text) then
 		return
 	end
 
-	-- The event was not handled by the UI, process it normally.
 end
 
 function love.keypressed(key, code, repeated)
+	-- Event Priority
+	if console:keypressed(key, code, repeated) then return end
 	if EditorDisplay:onKeyPressed(key, code, repeated) then
 		return
 	end
-
-	-- The event was not handled by the UI, process it normally.
 end
 
 function love.keyreleased(key, code)
+	if console:keyreleased(key, code) then return end
 	if EditorDisplay:onKeyReleased(key, code) then
 		return
 	end
@@ -271,6 +267,9 @@ function love.keyreleased(key, code)
 end
 
 function love.mousepressed(x, y, button, touch, presses)
+	if console:mousepressed(x, y, button, touch, presses) then
+		return
+	end
 	if EditorDisplay:onMousePressed(x, y, button, touch, presses) then
 		return
 	end
@@ -279,6 +278,7 @@ function love.mousepressed(x, y, button, touch, presses)
 end
 
 function love.mousereleased(x, y, button, touch, presses)
+	if console:mousereleased(x, y, button, touch, presses) then return end
 	if EditorDisplay:onMouseReleased(x, y, button, touch, presses) then
 		return
 	end
@@ -287,6 +287,7 @@ function love.mousereleased(x, y, button, touch, presses)
 end
 
 function love.mousemoved(x, y, dx, dy, touch)
+	if console:mousemoved(x, y, dx, dy, touch) then return end
 	if EditorDisplay:onMouseMoved(x, y, dx, dy, touch) then
 		return
 	end
@@ -295,6 +296,7 @@ function love.mousemoved(x, y, dx, dy, touch)
 end
 
 function love.wheelmoved(x, y)
+	if console:wheelmoved(x, y) then return end
 	if EditorDisplay:onWheelMoved(x, y) then
 		return
 	end
@@ -303,5 +305,6 @@ function love.wheelmoved(x, y)
 end
 
 function love.resize(width, height)
+	if console:resize(width, height) then return end
 	EditorDisplay:onResize(width, height)
 end
