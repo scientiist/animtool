@@ -1,19 +1,48 @@
---- Blacktop Saga Main Script
+--- animtool Main Script
+--- 2D Skeletal Animation Editor.
 --- @auth: Joshua O'Leary
 --- @name main.lua
 --- @copyright Conarium Software 2023
 --- @
 
+
+-- Enable Local Debugging
+if os.getenv("LOCAL_LUA_DEBUGGER_VSCODE") == "1" then
+    require("lldebugger").start()
+end
+
+
 -- Disables Texture Blurring
 love.graphics.setDefaultFilter("nearest", "nearest");
 
--- Preload Game Assets
-_G.Assets = require("src.assets");
+_G.editor = {};
+
 
 _G.console = require("src.console");
 
-console:addCommand("quit", "Exits the program");
-console:addCommand("import_skeleton", "Imports a skeleton file");
+console:addCommand({
+    keyword = "quit",
+    description = {},
+    callback = function(args)
+
+    end
+});
+console:addCommand({
+    keyword = "load_anim",
+    args = {"filename"},
+    description = {},
+    callback = function(args)
+
+    end
+});
+console:addCommand({
+    keyword = "load_anim",
+    aliases = {},
+    description = {},
+    callback = function(args)
+
+    end
+})
 
 -- Declare Objects
 local Vector2 = require("include.Vector2");
@@ -21,45 +50,50 @@ _G.Vector2 = Vector2;
 
 
 -- animtool Editor variables
-local bone = require("include.lovebone");
-local mySkeleton = require("src.TestSkeleton");
-local myActor = bone.newActor(mySkeleton);
+local bonelib = require("include.lovebone");
+editor.Skeleton = require("src.TestSkeleton");
+editor.Actor = bonelib.newActor(editor.Skeleton);
 
-local settings = {};
-settings.boneLineColor = {255, 0, 0, 255};
-settings.boneTextColor = {0, 255, 0, 255};
-settings.attachmentLineColor = {0, 0, 255, 255};
-settings.attachmentTextColor = {255, 0, 255, 255};
-myActor:SetDebug({
+editor.settings = {};
+
+editor.settings.skeleton = {};
+editor.settings.skeleton.boneLineColor = {255, 0, 0, 255};
+editor.settings.skeleton.boneTextColor = {0, 255, 0, 255};
+editor.settings.skeleton.attachmentLineColor = {0, 0, 255, 255};
+editor.settings.skeleton.attachmentTextColor = {255, 0, 255, 255};
+editor.Actor:SetDebug({
     "Neck", "UpperTorso", "LowerTorso",
     "UpperLeftArm", "LowerLeftArm", "LeftWrist",
     "UpperRightArm", "LowerRightArm", "RightWrist",
     "UpperLeftLeg", "LowerLeftLeg", "LeftAnkle",
     "UpperRightLeg", "LowerRightLeg", "RightAnkle"
-}, true, settings);
+}, true, editor.settings.skeleton);
 
-local testAnim = bone.newAnimation(mySkeleton);
+editor.Animations = {}; -- Can have several anims loaded at once
+-- Each anim gets its own timeline editor.
+editor.Animations[1] = bonelib.newAnimation(editor.Skeleton);
 
-testAnim:AddKeyFrame("UpperRightArm", 1, math.rad(85), nil, nil);
-testAnim:AddKeyFrame("LowerRightArm", 1.5, math.rad(85), nil, nil);
-testAnim:AddKeyFrame("LowerRightArm", 2, math.rad(45), nil, nil);
-testAnim:AddKeyFrame("LowerRightArm", 2.5, math.rad(85), nil, nil);
-testAnim:AddKeyFrame("LowerRightArm", 3, math.rad(45), nil, nil);
-testAnim:AddKeyFrame("LowerRightArm", 3.5, math.rad(85), nil, nil);
-testAnim:AddKeyFrame("LowerRightArm", 4, math.rad(45), nil, nil);
-testAnim:AddKeyFrame("LowerRightArm", 4.5, math.rad(85), nil, nil);
-testAnim:AddKeyFrame("LowerRightArm", 5, math.rad(45), nil, nil);
+editor.Animations[1]:AddKeyFrame("UpperRightArm", 1, math.rad(85), nil, nil);
+editor.Animations[1]:AddKeyFrame("LowerRightArm", 1.5, math.rad(85), nil, nil);
+editor.Animations[1]:AddKeyFrame("LowerRightArm", 2, math.rad(45), nil, nil);
+editor.Animations[1]:AddKeyFrame("LowerRightArm", 2.5, math.rad(85), nil, nil);
+editor.Animations[1]:AddKeyFrame("LowerRightArm", 3, math.rad(45), nil, nil);
+editor.Animations[1]:AddKeyFrame("LowerRightArm", 3.5, math.rad(85), nil, nil);
+editor.Animations[1]:AddKeyFrame("LowerRightArm", 4, math.rad(45), nil, nil);
+editor.Animations[1]:AddKeyFrame("LowerRightArm", 4.5, math.rad(85), nil, nil);
+editor.Animations[1]:AddKeyFrame("LowerRightArm", 5, math.rad(45), nil, nil);
 
-myActor:GetTransformer():SetTransform("anim_curl", testAnim);
+editor.Actor:GetTransformer():SetTransform("anim_curl", editor.Animations[1]);
 
 
 local filedialog = require("src.filedialog");
 
 require("include.ikkuna.ikkuna");
 
-local EditorDisplay = ikkuna.Display:new();
+editor.ui = ikkuna.Display:new();
+
 local widgets = ikkuna.Widget:new({
-    size = {width = 20, height = 24},
+    size = {width = 1000, height = 24},
     layout = {type = 'horizontal', args = {resizeParent = true}}, children = {
     {type = 'Button', args = {
         text = 'File',
@@ -67,24 +101,31 @@ local widgets = ikkuna.Widget:new({
             onClick = function()
                 local contextMenu = ikkuna.ContextMenu:new()
                 contextMenu:addOption("Import Skeleton",function()
-                    print("REEEEEEEEE"); 
+                    if filedialog then
+                        local handle = filedialog.open("Import Skeleton Script");
+                        print(handle);
+                        -- editor.Skeleton = require(handle);
+                        -- tbh we proly need editor:loadSkeleton(script);
+                    end
                 end);
                 contextMenu:addOption("Play Animation",function()
-                    myActor:GetTransformer():SetPower("anim_curl", 1);
+                    editor.Actor:GetTransformer():SetPower("anim_curl", 1);
                 end);
                 contextMenu:addOption("New Animation",function()
-                    myActor:GetTransformer():SetPower("anim_curl", 1);
+                    editor.Actor:GetTransformer():SetPower("anim_curl", 1);
                 end);
                 contextMenu:addOption("Open Animation",function()
                     if filedialog then
                     	local handle =  filedialog.open("Open Animation");
+                        print(handle);
                     end    
                 end);
                 contextMenu:addOption("Save Animation",function()
 
                     if filedialog then
-			local filename = filedialog.save("Save Animation");
-		    end
+                        local filename = filedialog.save("Save Animation");
+                        print(filename);
+                    end
                 end);
 
                 contextMenu:addSeparator();
@@ -97,6 +138,10 @@ local widgets = ikkuna.Widget:new({
         events = {
             onClick = function()
                 local contextMenu = ikkuna.ContextMenu:new()
+                contextMenu:addOption("Copy? (Ctrl+C)")
+                contextMenu:addOption("Cut? (Ctrl+X)")
+                contextMenu:addOption("Paste? (Ctrl+V)")
+                contextMenu:addSeparator();
                 contextMenu:addOption("Undo (Ctrl+Z)",function()
                     
                 end);
@@ -104,7 +149,7 @@ local widgets = ikkuna.Widget:new({
                     
                 end);
                 contextMenu:addOption("Cut Selection",function()
-                    myActor:GetTransformer():SetPower("anim_curl", 1);
+                    editor.Actor:GetTransformer():SetPower("anim_curl", 1);
                 end);
                 
 
@@ -132,25 +177,37 @@ local widgets = ikkuna.Widget:new({
         },
     }},
     {type = 'Button', args = {
-        text = 'Help',
+        text = 'Tools',
         events = {
             onClick = function()
-                --window:hide()
-                --gameRoot:show()
+                local contextMenu = ikkuna.ContextMenu:new()
+                contextMenu:addOption("Console",function()
+                    console.open = not console.open;
+                end);
+                contextMenu:addOption("Skeleton Inspector", function()
+                
+                end);
+                contextMenu:addOption("Keyframe Timeline", function()
+                
+                end)
+                contextMenu:addSeparator();
+                contextMenu:show()
             end,
         },
     }}
 }})
 
-EditorDisplay.root:addChild(widgets);
+editor.ui.root:addChild(widgets);
+
+
 
 
 -- Create the visual elements for the actor
 local boneVisual = {};
 -- Add attachments to the actor using the visual elements.
 
-for i, name in pairs(mySkeleton:GetBoneList()) do
-    local bonedata = mySkeleton:GetBone(name);
+for i, name in pairs(editor.Skeleton:GetBoneList()) do
+    local bonedata = editor.Skeleton:GetBone(name);
 
     
     local x, y = 10, 10;
@@ -188,16 +245,16 @@ for i, name in pairs(mySkeleton:GetBoneList()) do
 
 		return 255,255,255, 255;
 	end);
-	boneVisual = bone.newVisual(imageData);
+	boneVisual = bonelib.newVisual(imageData);
 	local vw, vh = boneVisual:GetDimensions();
 	boneVisual:SetOrigin(vw/2, 0);
 
 
-	local myAttachment = bone.newAttachment(boneVisual);
-	myActor:SetAttachment(name, "skin", myAttachment);
+	local myAttachment = bonelib.newAttachment(boneVisual);
+	editor.Actor:SetAttachment(name, "skin", myAttachment);
 end
 --myActor:GetTransformer():GetRoot().rotation = math.rad(-90);
-myActor:GetTransformer():GetRoot().translation = {love.graphics.getWidth() / 2, love.graphics.getHeight() / 2};
+editor.Actor:GetTransformer():GetRoot().translation = {love.graphics.getWidth() / 2, love.graphics.getHeight() / 2};
 
 
 function love.load()
@@ -205,45 +262,51 @@ function love.load()
 	love.window.setMode(1200, 700, {msaa=0});
 end
 
-local prevMous = Vector2.new(love.mouse.getX(), love.mouse.getY());
+
+
+local function get_engine_data()
+    local graphics = love.graphics.getStats();
+    local lua_mem_mb = math.floor(collectgarbage('count')/1000);
+    local gpu_mem_kb = math.floor(graphics.texturememory/1000);
+
+    local os = love.system.getOS();
+    local cores = love.system.getProcessorCount();
+
+    return 
+    ("fps: %s"):format(love.timer.getFPS()) ..
+    (" lua: %smb"):format(lua_mem_mb) ..
+    (" gpu: %skb"):format(gpu_mem_kb) ..
+    (" os: %s"):format(os)..
+    (" cores: %s"):format(cores);
+end
+
 
 function love.update(delta)
 	console:Update(delta);
-    myActor:Update(delta);
+    editor.Actor:Update(delta);
+    editor.ui:update(delta);
 
-    EditorDisplay:update(delta);
-
-    if (myActor:GetTransformer():GetPower("anim_curl") > 0) then
-		local vars = myActor:GetTransformer():GetVariables("anim_curl");
+    if (editor.Actor:GetTransformer():GetPower("anim_curl") > 0) then
+		local vars = editor.Actor:GetTransformer():GetVariables("anim_curl");
 		vars.time = vars.time + delta;
 	end
 
-    if love.keyboard.isDown("escape") then
-        love.event.quit()
-    end
-
-    if love.keyboard.isDown("r") then
-        love.event.quit("restart")
-    end
+   
 
 
-    local currMous = Vector2.new(love.mouse.getX(), love.mouse.getY());
-    if love.mouse.isDown(1) then
-        local deltaMous = currMous - prevMous;
-        
-    end
-    prevMous = currMous;
 end
 
 function love.draw()
 	console:Draw();
-    myActor:Draw();
-    EditorDisplay:draw();
+    editor.Actor:Draw();
+    editor.ui:draw();
+
+    love.graphics.print(get_engine_data(), 0, love.graphics.getHeight()-16);
 end
 
 function love.textinput(text)
 	if console:textinput(text) then return end
-	if EditorDisplay:onTextInput(text) then
+	if editor.ui:onTextInput(text) then
 		return
 	end
 
@@ -252,14 +315,23 @@ end
 function love.keypressed(key, code, repeated)
 	-- Event Priority
 	if console:keypressed(key, code, repeated) then return end
-	if EditorDisplay:onKeyPressed(key, code, repeated) then
+	if editor.ui:onKeyPressed(key, code, repeated) then
 		return
 	end
+
+
+    if key == "escape" then
+        love.event.quit()
+    end
+
+    if key == "r" then
+        love.event.quit("restart")
+    end
 end
 
 function love.keyreleased(key, code)
 	if console:keyreleased(key, code) then return end
-	if EditorDisplay:onKeyReleased(key, code) then
+	if editor.ui:onKeyReleased(key, code) then
 		return
 	end
 
@@ -270,7 +342,7 @@ function love.mousepressed(x, y, button, touch, presses)
 	if console:mousepressed(x, y, button, touch, presses) then
 		return
 	end
-	if EditorDisplay:onMousePressed(x, y, button, touch, presses) then
+	if editor.ui:onMousePressed(x, y, button, touch, presses) then
 		return
 	end
 
@@ -278,33 +350,29 @@ function love.mousepressed(x, y, button, touch, presses)
 end
 
 function love.mousereleased(x, y, button, touch, presses)
-	if console:mousereleased(x, y, button, touch, presses) then return end
-	if EditorDisplay:onMouseReleased(x, y, button, touch, presses) then
-		return
-	end
+	console:mousereleased(x, y, button, touch, presses)
+	editor.ui:onMouseReleased(x, y, button, touch, presses)
 
 	-- The event was not handled by the UI, process it normally.
 end
 
 function love.mousemoved(x, y, dx, dy, touch)
-	if console:mousemoved(x, y, dx, dy, touch) then return end
-	if EditorDisplay:onMouseMoved(x, y, dx, dy, touch) then
-		return
-	end
+	console:mousemoved(x, y, dx, dy, touch)
+	editor.ui:onMouseMoved(x, y, dx, dy, touch)
 
 	-- The event was not handled by the UI, process it normally.
 end
 
 function love.wheelmoved(x, y)
-	if console:wheelmoved(x, y) then return end
-	if EditorDisplay:onWheelMoved(x, y) then
-		return
-	end
+    editor.ui:onWheelMoved(x, y)
+	console:wheelmoved(x, y)
+	
 
 	-- The event was not handled by the UI, process it normally.
 end
 
 function love.resize(width, height)
-	if console:resize(width, height) then return end
-	EditorDisplay:onResize(width, height)
+    editor.ui:onResize(width, height)
+	console:resize(width, height)
+	
 end
