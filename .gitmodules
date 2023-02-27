@@ -7,3 +7,6 @@
 [submodule "include/love-bone"]
 	path = include/love-bone
 	url = https://github.com/scientiist/love-bone
+[submodule "json.lua"]
+	path = json.lua
+	url = https://github.com/rxi/json.lua

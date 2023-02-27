@@ -1,1 +1,0 @@
-require("include.ikkuna.ikkuna");
