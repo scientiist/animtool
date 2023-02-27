@@ -95,6 +95,9 @@ gchar * gtk_file_chooser_get_filename (
 local function show (action, button, title)
     gtk.gtk_init(nil, nil)
 
+    love.filesystem.getWorkingDirectory();
+    
+
     local d = gtk.gtk_file_chooser_dialog_new(
         title,
         nil,
@@ -102,7 +105,7 @@ local function show (action, button, title)
         button, ffi.cast('const gchar *', gtk.GTK_RESPONSE_OK),
         '_Cancel', ffi.cast('const gchar *', gtk.GTK_RESPONSE_CANCEL),
         nil)
-        
+    
     local response = gtk.gtk_dialog_run(d)
     local filename = gtk.gtk_file_chooser_get_filename(d)
 
