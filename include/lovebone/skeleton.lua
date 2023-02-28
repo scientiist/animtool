@@ -15,6 +15,7 @@ local function newSkeleton()
 	skeleton.BoneNames = {};
 	skeleton.Bones = {};
 	skeleton.Bones[SKELETON_ROOT_NAME] = newBone();
+	skeleton.Bones[SKELETON_ROOT_NAME].Name = SKELETON_ROOT_NAME;
 	skeleton.RenderOrder = {};
 	skeleton.Valid = true;
 	return skeleton;
@@ -59,6 +60,7 @@ end
 
 -- Adds a bone to the skeleton.
 function MSkeleton:SetBone(boneName, boneObj)
+	
 	if (not boneName or type(boneName) ~= "string") then
 		error(util.errorArgs("BadArg", 1, "SetBone", "string", type(boneName)));
 	elseif (not boneObj or not util.isType(boneObj, "Bone")) then
@@ -67,7 +69,10 @@ function MSkeleton:SetBone(boneName, boneObj)
 	if (not boneObj:GetParent() and boneName ~= SKELETON_ROOT_NAME) then
 		boneObj:SetParent(SKELETON_ROOT_NAME);
 	end
+
+	
 	self.Bones[boneName] = boneObj;
+	self.Bones[boneName].Name = boneName;
 	self.Valid = false;
 end
 

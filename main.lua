@@ -6,6 +6,11 @@
 --- @
 
 
+
+-- TODO List:
+-- Animation Keyframe Window
+
+
 -- Enable Local Debugging
 if os.getenv("LOCAL_LUA_DEBUGGER_VSCODE") == "1" then
     require("lldebugger").start()
@@ -296,10 +301,40 @@ function love.update(delta)
 
 end
 
+local i = 0;
+local function iter_skeleton(bone, nesting)
+    nesting = nesting or 0
+    
+    local tabs = string.rep("\t", nesting, "");
+    local text = tabs..bone.Name.." offset: {"..bone.Offset[1]..", "..bone.Offset[2].."}"..
+        " rot:"..bone.Rotation.." transl: {"..bone.Translation[1]..", "..bone.Translation[2].."}"
+    love.graphics.print(text, 0, 128+i);
+    if bone.Children then
+        for idx, childBoneName in pairs(bone.Children) do
+            i=i+12;
+            local childBone = editor.Skeleton:GetBone(childBoneName);
+            iter_skeleton(childBone, nesting + 1);
+        end
+    end
+end
+
+
+
 function love.draw()
 	console:Draw();
     editor.Actor:Draw();
     editor.ui:draw();
+
+
+i = 0;
+    local rootbone = editor.Skeleton.Bones["__root__"];
+
+    iter_skeleton(rootbone);
+
+        
+
+    
+
 
     love.graphics.print(get_engine_data(), 0, love.graphics.getHeight()-16);
 end
